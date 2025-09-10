@@ -1,0 +1,284 @@
+---
+title: "Tablas de frecuencias y contingencias"
+author: "Maestría en Ciencia de Datos"
+date: "2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tablas de frecuencias
+Una tabla de frecuencias muestra el conteo de observaciones para cada categoría de una variable. Usaremos la función table() para crear una.
+
+Ejemplo 1: Tabla de Frecuencias Simple
+
+Supongamos que tienes un vector de datos categóricos y quieres conocer la frecuencia de cada categoría.
+
+```{r}
+# Vector de ejemplo
+colores <- c("rojo", "azul", "verde", "azul", "rojo", "verde", "verde", "azul")
+
+# Crear tabla de frecuencias
+tabla_frecuencias <- table(colores)
+print(tabla_frecuencias)
+
+```
+
+### Tablas de Contingencia
+Las tablas de contingencia son útiles para examinar la relación entre dos variables categóricas. También utilizamos table() para esto.
+
+Ejemplo 2: Tabla de Contingencia
+
+Imagina que tienes dos vectores categóricos y deseas explorar cómo se relacionan entre sí.
+
+```{r}
+# Dos vectores de ejemplo
+genero <- c("F", "M", "F", "F", "M", "M", "F", "M")
+color_preferido <- c("rojo", "azul", "verde", "azul", "rojo", "verde", "verde", "azul")
+
+# Crear tabla de contingencia
+tabla_contingencia <- table(genero, color_preferido)
+print(tabla_contingencia)
+
+```
+
+## Frecuencias Relativas
+A veces, es útil ver las frecuencias relativas en lugar de los conteos absolutos.
+
+Ejemplo 3: Frecuencias Relativas en Tabla de Contingencia
+
+```{r}
+# Convertir a frecuencias relativas
+frecuencias_relativas <- prop.table(tabla_contingencia)
+print(frecuencias_relativas)
+
+```
+
+### Tablas de Contingencia con Más de Dos Variables
+Puedes crear tablas de contingencia con más de dos variables para explorar relaciones más complejas.
+
+Ejemplo 4: Tabla de Contingencia de Tres Vías
+```{r}
+# Un tercer vector de ejemplo
+edad_grupo <- c("adulto", "adulto", "joven", "joven", "adulto", "joven", "joven", "adulto")
+
+# Crear tabla de contingencia de tres vías
+tabla_contingencia_3d <- table(genero, color_preferido, edad_grupo)
+print(tabla_contingencia_3d)
+
+```
+### Visualizar Tablas de Contingencia
+Finalmente, puedes visualizar estas tablas usando paquetes como ggplot2 para una mejor interpretación.
+
+Ejemplo 5: Visualización con ggplot2
+```{r}
+library(ggplot2)
+
+# Convertir la tabla de contingencia a formato de dataframe para ggplot
+df_contingencia <- as.data.frame(table(genero, color_preferido))
+
+# Crear gráfico de barras
+ggplot(df_contingencia, aes(x = genero, y = Freq, fill = color_preferido)) +
+  geom_bar(stat = "identity", position = position_dodge())
+
+```
+
+## Knitr kable
+kable es una función del paquete knitr que proporciona una forma sencilla de convertir un objeto R en una tabla HTML/LaTeX.
+```{r}
+library(knitr)
+
+kable(tabla_contingencia)
+
+```
+
+### xtable
+xtable convierte una tabla de R a formato HTML/LaTeX, ofreciendo opciones más avanzadas de formato.
+
+```{r}
+library(xtable)
+
+print(xtable(tabla_contingencia), type = "latex")
+
+```
+
+### ftable
+ftable es útil para tablas de contingencia de mayor dimensionalidad, ya que presenta los datos en un formato más compacto y fácil de leer.
+
+```{r}
+ftable(tabla_contingencia)
+
+```
+
+### DT::datatable
+datatable del paquete DT es especialmente útil para tablas interactivas en aplicaciones web y Shiny.
+
+```{r}
+library(DT)
+
+datatable(as.data.frame.matrix(tabla_contingencia))
+
+```
+
+
+## Frecuencias absolutas, relativas y acumuladas
+
+Crear una tabla de frecuencias que muestre la frecuencia absoluta, frecuencia acumulada, frecuencia relativa y frecuencia relativa acumulada es un ejercicio útil para entender la distribución de los datos.
+
+
+### Datos de ejemplo
+```{r}
+datos <- c("A", "B", "A", "C", "B", "A", "A", "B", "C", "C", "B", "A", "B", "C", "A")
+
+```
+
+### Absolutas
+```{r}
+tabla_absoluta <- table(datos)
+print(tabla_absoluta)
+```
+
+### Acumuladas
+```{r}
+frec_acumulada <- cumsum(tabla_absoluta)
+print(frec_acumulada)
+```
+
+
+### Relativas
+```{r}
+frec_relativa <- prop.table(tabla_absoluta)
+print(frec_relativa)
+```
+
+### Relativas acumuladas
+```{r}
+frec_relativa_acumulada <- cumsum(frec_relativa)
+print(frec_relativa_acumulada)
+```
+
+### Combinando
+
+```{r}
+tabla_frecuencias <- data.frame(
+  Frecuencia_Absoluta = tabla_absoluta,
+  Frecuencia_Acumulada = frec_acumulada,
+  Frecuencia_Relativa = round(frec_relativa*100, 1),
+  Frecuencia_Relativa_Acumulada = round(frec_relativa_acumulada*100, 1)
+)
+
+print(tabla_frecuencias)
+
+```
+
+
+## Tablas de contingencia: Test de independencias
+
+
+La asociación estadística usando chi-cuadrado se construye a partir de la comparación entre los valores observados en una tabla de contingencia y los valores esperados bajo la hipótesis nula de independencia entre las variables categóricas. Aquí tienes una guía paso a paso para calcularlo:
+
+Pasos para calcular la prueba de Chi-cuadrado
+Definir las hipótesis:
+
+- Hipótesis nula ($H_0$): Las dos variables son independientes (no están asociadas).
+- Hipótesis alternativa ($H_a$): Las dos variables no son independientes (hay asociación).
+
+Paso 1: Se calculan las frecuencias esperadas (Eij):
+Bajo la hipótesis nula, los valores esperados se calculan como:
+
+$$
+E_{ij}=\frac{(Total fila i)\times(Total columna j)}{(Total general)}
+$$
+
+
+Paso 2: Calcular la contribución al estadístico Chi-cuadrado para cada celda:
+
+$$
+Contribución = \frac{(O_{ij}-E{ij})^2}{E_{ij}}
+$$
+
+Paso 3: Se suman las contribuciones de todas las celdas, construyendo el estadístico Chi Cuadrado:
+
+$$
+\chi^2 = \sum \frac{(O_{ij}-E{ij})^2}{E_{ij}}
+$$
+
+Paso 4: Se determinan los grados de libertad y se busca el pvalor asociado al estadístico:
+
+$$
+df = ((filas−1)×(columnas−1))
+$$
+
+Y por consiguiente se ubica el p-valor asociado.
+
+- Si el p-valor es menor que el nivel de significancia ($\alpha$, generalmente 0.05), rechazamos $H_0$ y concluimos que hay una asociación significativa entre las variables.
+- Si el p-valor es mayor que $\alpha$, no rechazamos $H_0$ y concluimos que las variables son independientes.
+
+
+Aplicamos con los datos. Existen 2 maneras:
+
+#### chisq.test
+Dataset
+```{r}
+set.seed(123)
+d <- data.frame(ID = 1:2000, 
+                edad = floor(runif(2000, min = 18, max = 65)), 
+                escolaridad = floor(runif(2000, min = 1, max = 19)), 
+                hijos = floor(runif(2000, min = 0, max = 5)), 
+                ingresos = floor(runif(2000, min = 1130, max = 5000)), 
+                sexo = sample(c("Hombre", "Mujer"), size = 2000, replace = TRUE), 
+                ciudad = sample(c("Lima", "Arequipa", "Huancayo", "Trujillo", "Iquitos"), size = 2000, replace = TRUE))
+head(d)
+```
+
+```{r}
+tabla <- table(d$sexo, d$ciudad)
+print(tabla)
+```
+
+```{r}
+# Prueba de Chi-cuadrado
+resultado <- chisq.test(tabla)
+
+# Mostrar resultados
+print(resultado)
+
+```
+
+
+#### librería gmodels
+```{r}
+library(gmodels)
+# Tabla de contingencia con chi-cuadrado
+CrossTable(d$sexo, d$ciudad, chisq = TRUE, prop.chisq = TRUE)
+
+```
+
+### Con datos de empleo: informalidad versus nivel educativo
+
+```{r}
+ruta <- 'E:/EX ONEDRIVE UAI/consultorias 2024/docencia 2024/ucontinental/1 mds/1_modelosestadisticos/v2/u3/Data/'
+epen <- read.csv(paste0(ruta, 'epen2023.csv'), sep = ',', encoding = 'UTF-8')
+```
+
+```{r}
+CrossTable(epen$AREA, epen$Informal_P, chisq = TRUE, prop.chisq = TRUE)
+```
+ 
+```{r}
+chisq.test(table(epen$AREA, epen$Informal_P))
+```
+
+```{r}
+CrossTable(epen$C366, epen$Informal_P, chisq = TRUE, prop.chisq = TRUE)
+
+```
+
+
+```{r}
+chisq.test(table(epen$C366, epen$Informal_P))
+
+```
+

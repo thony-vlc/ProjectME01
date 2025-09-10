@@ -1,0 +1,176 @@
+---
+title: "Creando vectores y dataframes"
+author: "Maestría en Ciencia de Datos"
+date: "2024"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Creación de vectores
+
+### 1. Crear un Vector Numérico
+
+```{r cars}
+# Crear un vector numérico
+vector_numerico <- c(1, 2, 3, 4, 5)
+print(vector_numerico)
+```
+
+### 2. Crear un Vector de Caracteres
+
+```{r pressure, echo=FALSE}
+# Crear un vector de caracteres
+vector_caracteres <- c("manzana", "banana", "cereza", "4", "76", 'licuadora')
+print(vector_caracteres)
+```
+
+### 3. Crear un Vector Lógico
+
+```{r}
+# Crear un vector lógico
+vector_logico <- c(TRUE, FALSE, TRUE, FALSE)
+print(vector_logico)
+
+print(5==6)
+print(15^2 == 3*5^2)
+print(15^2 == (3^2)*(5^2))
+
+```
+
+### 4. Crear un Vector de Secuencia Numérica
+
+```{r}
+# Crear un vector con una secuencia de números
+vector_secuencia <- seq(0, 10, 0.01)
+print(vector_secuencia)
+
+# Otra forma, utilizando el operador de secuencia ":" --> Solo para números enteros
+vector_secuencia_simple <- 1:10
+print(vector_secuencia_simple)
+
+```
+
+### 5. Repetir Elementos para Formar un Vector
+
+```{r}
+# Crear un vector repitiendo elementos
+vector_repetido <- rep(1, times = 50)
+print(vector_repetido)
+
+vector_anidado <- rep(1:20, times = 10)
+print(vector_anidado)
+
+vector_anidado_texto <- rep(c('a', 'e', 'i', 'o', 'u'), times = 5)
+print(vector_anidado_texto)
+
+```
+
+## Operaciones con vectores
+
+### Operaciones Aritméticas
+
+```{r}
+# Crear dos vectores numéricos
+vector_a <- c(1, 2, 3, 4, 5)
+vector_b <- c(5, 4, 3, 2, 1)
+
+```
+
+
+#### Suma
+```{r}
+suma <- vector_a + vector_b
+print(suma)
+
+```
+
+#### Resta
+```{r}
+resta <- vector_a - vector_b
+print(resta)
+
+```
+
+#### Multiplicación
+```{r}
+multiplicacion <- vector_a * vector_b
+print(multiplicacion)
+
+```
+
+#### División
+```{r}
+division <- vector_a / vector_b
+print(division)
+
+```
+
+
+### Operaciones Lógicas
+
+```{r}
+# Crear vectores lógicos
+vector_logico1 <- c(TRUE, FALSE, TRUE)
+vector_logico2 <- c(FALSE, FALSE, TRUE)
+
+```
+
+#### AND
+```{r}
+and_logico <- vector_logico1 & vector_logico2
+print(and_logico)
+
+```
+
+#### OR
+```{r}
+or_logico <- vector_logico1 | vector_logico2
+print(or_logico)
+
+```
+
+#### Negación
+```{r}
+negacion <- !vector_logico1
+print(negacion)
+
+```
+
+
+### Funciones específicas de vectores
+
+#### Longitud
+```{r}
+longitud <- length(vector_a)
+print(longitud)
+
+```
+
+
+#### Suma de elementos
+```{r}
+suma_elementos <- sum(vector_a)
+print(suma_elementos)
+
+```
+
+#### Media aritmética
+```{r}
+media <- mean(vector_a)
+print(media)
+
+```
+
+#### Máximo y mínimo valor
+```{r}
+maximo <- max(vector_a)
+minimo <- min(vector_a)
+print(maximo)
+print(minimo)
+
+```
+

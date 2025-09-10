@@ -1,0 +1,130 @@
+---
+title: "Listas"
+author: "Maestría en Ciencia de Datos"
+date: "2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Listas
+
+### Creación de una lista: 
+Puedes crear una lista utilizando la función list(). 
+
+```{r}
+mi_lista <- list(nombre = "Ana", edades_hijos = c(23, 15, 17), es_estudiante = TRUE)
+print(mi_lista)
+```
+Aquí, mi_lista contiene un string ("Ana"), un vector de números (c(23, 45, 67)) y un valor booleano (TRUE).
+
+### Acceso a los elementos de la lista: 
+Puedes acceder a los elementos de la lista utilizando los índices o los nombres de los elementos. Por ejemplo:
+
+```{r}
+# Acceso por índice
+mi_lista[[1]] # Devuelve "Ana"
+# Acceso por nombre
+mi_lista$nombre # También devuelve "Ana"
+
+```
+
+
+```{r}
+# Acceso por índice
+mi_lista[[2]] #
+# Acceso por nombre
+mi_lista$es_estudiante # 
+
+```
+
+
+### Modificar una lista: 
+Puedes modificar los elementos de la lista o agregar nuevos elementos. Por ejemplo:
+```{r}
+mi_lista$nombre <- "Carlos"
+
+
+# Añadir un nuevo elemento
+mi_lista$color_favorito <- "Azul"
+
+
+mi_lista$propiedades <- c("Departamento", "2 autos", "Terreno agrícola")
+
+print(mi_lista)
+```
+
+
+### Longitud de una lista: 
+Puedes usar length() para obtener la cantidad de elementos en una lista.
+
+```{r}
+length(mi_lista)
+
+```
+
+
+### Iterar sobre una lista: 
+Puedes usar un bucle como for para iterar sobre los elementos de una lista.
+
+```{r}
+for (elemento in mi_lista) {
+  print(elemento)
+}
+```
+
+```{r}
+nueva_lista <- list(costa = c(200, 80, 20, 90, 180), sierra = c(50, 45, 120, 90), selva = c(25, 80, 120, 85, 160, 45))
+for (elemento in nueva_lista) {
+  print(mean(elemento))
+}
+```
+## Listas anidadas
+También se pueden añadir listas como elementos de una lista mayor.
+
+### Crear una lista vacía: Primero, empezamos con una lista vacía.
+
+```{r}
+mi_lista <- list()
+
+```
+
+### Añadir elementos a la lista: 
+Luego, añadimos elementos a la lista. Los elementos pueden ser de cualquier tipo, como números, cadenas, vectores, etc.
+
+```{r}
+# Añadir un número
+mi_lista$numero <- 42
+
+# Añadir una cadena
+mi_lista$nombre <- "Pedro"
+
+# Añadir un vector
+mi_lista$colores <- c("rojo", "verde", "azul")
+
+# Añadir una matriz
+mi_lista$matriz <- matrix(1:9, nrow = 3)
+
+print(mi_lista)
+```
+
+
+### Añadir un elemento de lista dentro de una lista: 
+También puedes añadir una lista como un elemento dentro de otra lista.
+
+```{r}
+# Añadir una sublista
+mi_lista$sub_lista <- list(a = 1, b = c(1, 2, 3, 4, 5), c = 4)
+
+```
+
+
+### Ver la lista completa
+Después de añadir los elementos, puedes ver la estructura completa de la lista.
+```{r}
+print(mi_lista)
+
+```
+

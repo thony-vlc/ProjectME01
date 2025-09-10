@@ -1,0 +1,283 @@
+---
+title: "Plots"
+author: "Maestría en Ciencia de Datos"
+date: "2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bank Marketing
+<!-- The data is related with direct marketing campaigns (phone calls) of a Portuguese banking institution. The classification goal is to predict if the client will subscribe a term deposit (variable y). -->
+
+
+## About this file
+
+### Attribute Information:
+
+- **age** (numeric)
+- **job**: type of job (categorical: `admin.`, `blue-collar`, `entrepreneur`, `housemaid`, `management`, `retired`, `self-employed`, `services`, `student`, `technician`, `unemployed`, `unknown`)
+- **marital**: marital status (categorical: `divorced`, `married`, `single`, `unknown`; note: `divorced` means divorced or widowed)
+- **education** (categorical: `basic.4y`, `basic.6y`, `basic.9y`, `high.school`, `illiterate`, `professional.course`, `university.degree`, `unknown`)
+- **default**: has credit in default? (categorical: `no`, `yes`, `unknown`)
+- **balance**: average yearly balance, in euros (numeric)
+- **housing**: has housing loan? (categorical: `no`, `yes`, `unknown`)
+- **loan**: has personal loan? (categorical: `no`, `yes`, `unknown`)
+- **contact**: contact communication type (categorical: `cellular`, `telephone`)
+- **day**: last contact day of the month (numeric 1–31)
+- **month**: last contact month of year (categorical: `jan`, `feb`, `mar`, …, `nov`, `dec`)
+- **duration**: last contact duration, in seconds (numeric)
+  - **Important note**: this attribute highly affects the output target (e.g., if `duration = 0` then `y = 'no'`). Yet, the duration is not known before a call is performed. Also, after the end of the call `y` is obviously known. Thus, this input should only be included for benchmark purposes and should be discarded if the intention is to have a realistic predictive model.
+- **campaign**: number of contacts performed during this campaign and for this client (numeric, includes last contact)
+- **pdays**: number of days that passed by after the client was last contacted from a previous campaign (numeric; `999` means client was not previously contacted)
+- **previous**: number of contacts performed before this campaign and for this client (numeric)
+- **poutcome**: outcome of the previous marketing campaign (categorical: `failure`, `nonexistent`, `success`)
+- **target**: has the client subscribed to a term deposit? (binary: `"yes"`, `"no"`)
+
+
+
+```{r}
+getwd()
+bank <- read.csv('E:/EX ONEDRIVE UAI/consultorias 2024/docencia 2024/ucontinental/1 mds/1_modelosestadisticos/v2/u2/data/bank-full.csv', sep = ',', encoding = 'UTF-8')
+# bank <- read.csv(file.choose(), sep = ',', encoding = 'UTF-8')
+print(head(bank))
+```
+
+## Plots
+
+### Scatterplots
+```{r, echo=FALSE}
+plot(bank$age, bank$balance, col = 'red')
+```
+
+### scatterplot Agregaciones
+```{r}
+library(dplyr)
+bank %>% group_by(age) %>% summarise(saldo_promedio = mean(balance)) %>% plot(col = 'red', type = 'b')
+```
+
+
+## boxplot
+```{r}
+boxplot(balance ~ marital, data = bank, col = 'green') 
+```
+
+## horizontal boxplot
+```{r}
+boxplot(balance ~ education, data = subset(bank, balance < 5000 & balance>-5000), col = 'blue', horizontal = TRUE)
+```
+
+
+
+
+
+
+```{r}
+boxplot(balance ~ month, data = subset(bank, balance < 5000 & balance>-5000), col = 'blue', horizontal = FALSE)
+```
+
+```{r}
+loan_summary <- table(bank$housing, bank$loan)
+
+barplot(loan_summary,
+        beside = FALSE, # Apilado
+        col = c("skyblue", "pink"),
+        legend = rownames(loan_summary),
+        xlab = "Préstamo Hipotecario",
+        ylab = "Frecuencia",
+        main = "Préstamos Hipotecarios y Personales")
+
+```
+
+```{r}
+bank %>%
+  group_by(age) %>%
+  summarise(target_yes = mean(Target == "yes", na.rm = TRUE)) %>%
+  { 
+    plot(.$age, .$target_yes, 
+         type = "l", 
+         col = "purple", 
+         lwd = 2, 
+         xlab = "Edad", 
+         ylab = "Proporción de 'Sí' en Depósitos", 
+         main = "Proporción de Depósitos Contratados por Edad")
+  }
+
+```
+
+
+```{r}
+plot(bank$campaign, bank$duration,
+     xlab = "Número de Contactos (Campañas)",
+     ylab = "Duración del Último Contacto (segundos)",
+     main = "Relación entre Campañas y Duración",
+     col = "green",
+     pch = 16)
+
+```
+
+
+```{r}
+
+bank2 <- subset(bank, balance < 5000 & balance>-5000)
+
+# Filtrar las dos series
+saldo_con_prestamo <- bank2$balance[bank2$loan == "yes"]
+saldo_sin_prestamo <- bank2$balance[bank2$loan == "no"]
+
+# Crear histogramas superpuestos
+hist(saldo_con_prestamo, 
+     breaks = 30, 
+     col = rgb(1, 0, 0, 0.5), 
+     xlim = range(bank2$balance), 
+     main = "Distribución del Saldo por Préstamo Personal", 
+     xlab = "Saldo",
+     ylab = "Frecuencia")
+hist(saldo_sin_prestamo, 
+     breaks = 30, 
+     col = rgb(0, 0, 1, 0.5), 
+     add = TRUE) # Superponer
+
+# Añadir leyenda
+legend("topright", 
+       legend = c("Con Préstamo", "Sin Préstamo"), 
+       fill = c(rgb(1, 0, 0, 0.5), rgb(0, 0, 1, 0.5)))
+
+```
+
+```{r}
+bank %>%
+  group_by(age) %>%
+  summarise(
+    saldo_promedio = mean(balance, na.rm = TRUE),
+    saldo_mediana = median(balance, na.rm = TRUE)
+  ) %>%
+  {
+    plot(.$age, .$saldo_promedio, 
+         type = "l", 
+         col = "red", 
+         lwd = 2, 
+         xlab = "Edad", 
+         ylab = "Saldo", 
+         main = "Promedio y Mediana del Saldo por Edad")
+    lines(.$age, .$saldo_mediana, 
+          col = "blue", 
+          lwd = 2)
+    legend("topright", 
+           legend = c("Saldo Promedio", "Saldo Mediana"), 
+           col = c("red", "blue"), 
+           lty = 1, 
+           lwd = 2)
+  }
+
+```
+
+```{r}
+bank3 <- subset(bank, poutcome != "unknown")
+outcome_by_job <- table(bank3$poutcome, bank3$job)
+
+barplot(outcome_by_job, 
+        col = c("green", "yellow", "red", "blue"), 
+        main = "Resultados de Campaña por Ocupación", 
+        xlab = "Ocupación", 
+        ylab = "Frecuencia", 
+        las = 2, 
+        legend = rownames(outcome_by_job))
+
+```
+
+
+```{r}
+# Calcular tasas
+job_target <- bank %>%
+  group_by(job) %>%
+  summarise(target_rate = mean(Target == "yes", na.rm = TRUE))
+
+# Graficar
+barplot(job_target$target_rate, 
+        names.arg = job_target$job, 
+        col = "orange", 
+        main = "Tasa de Contratación por Ocupación", 
+        xlab = "Ocupación", 
+        ylab = "Tasa de Contratación", 
+        las = 2) # Rotar etiquetas
+
+```
+
+```{r}
+# Calcular tasas agrupando edades en intervalos
+bank %>%
+  mutate(age_group = cut(age, breaks = seq(0, 100, by = 10), include.lowest = TRUE)) %>%
+  group_by(age_group) %>%
+  summarise(target_rate = mean(Target == "yes", na.rm = TRUE)) %>%
+  {
+    age_group_clean <- droplevels(.$age_group) # Eliminar niveles vacíos
+    plot(as.numeric(age_group_clean), .$target_rate, 
+         type = "b", # Línea y puntos
+         col = "red", 
+         pch = 16, 
+         xlab = "Grupo de Edad", 
+         ylab = "Tasa de Contratación", 
+         main = "Tasa de Contratación por Grupo de Edad", 
+         xaxt = "n") # Ocultar etiquetas del eje x
+    axis(1, at = 1:length(levels(age_group_clean)), labels = levels(age_group_clean)) # Etiquetas personalizadas
+  }
+
+```
+
+
+
+```{r}
+# Calcular tasas
+marital_target <- bank %>%
+  group_by(marital) %>%
+  summarise(target_rate = mean(Target == "yes", na.rm = TRUE))
+
+# Graficar
+barplot(marital_target$target_rate, 
+        names.arg = marital_target$marital, 
+        col = "lightgreen", 
+        main = "Tasa de Contratación por Estado Civil", 
+        xlab = "Estado Civil", 
+        ylab = "Tasa de Contratación")
+
+```
+
+
+
+```{r}
+# Calcular tasas
+education_target <- bank %>%
+  group_by(education) %>%
+  summarise(target_rate = mean(Target == "yes", na.rm = TRUE))
+
+# Graficar
+barplot(education_target$target_rate, 
+        names.arg = education_target$education, 
+        col = "lightblue", 
+        main = "Tasa de Contratación por Nivel Educativo", 
+        xlab = "Nivel Educativo", 
+        ylab = "Tasa de Contratación", 
+        las = 2) # Rotar etiquetas
+
+```
+
+```{r}
+# Calcular la proporción de "yes" en Target por poutcome
+poutcome_target <- bank %>%
+  group_by(poutcome) %>%
+  summarise(target_rate = mean(Target == "yes", na.rm = TRUE))
+
+# Graficar la proporción
+barplot(poutcome_target$target_rate, 
+        names.arg = poutcome_target$poutcome, 
+        col = "magenta", 
+        main = "Proporción de Target ('Yes') por Resultado de Campaña Previa", 
+        xlab = "Resultado de Campaña Previa (poutcome)", 
+        ylab = "Proporción de 'Yes'", 
+        las = 1) # Rotar etiquetas del eje Y
+
+```
+

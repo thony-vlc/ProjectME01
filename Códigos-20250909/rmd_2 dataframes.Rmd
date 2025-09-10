@@ -1,0 +1,377 @@
+---
+title: "Dataframes y tablas"
+author: "Maestría en Ciencia de Datos"
+date: "2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Dataframes y tablas
+
+
+## Creación de dataframes
+
+<!-- Imaginemos que se quiere crear un DataFrame que contenga datos sobre un grupo de personas, incluyendo su nombre, edad y ciudad de residencia: -->
+
+```{r}
+# Crear vectores para cada columna
+nombres <- c("Ana", "Luis", "Marta", "Juan", "Sofía")
+edades <- c(28, 34, 21, 45, 30)
+ciudades <- c("Lima", "Trujillo", "Sullana", "Arequipa", "Iquitos")
+
+# Crear el DataFrame
+personas_df <- data.frame(Nombre = nombres, 
+                          Edad = edades, 
+                          Ciudad = ciudades)
+
+# Mostrar el DataFrame
+print(personas_df)
+
+```
+
+## Operaciones comunes con dataframes
+
+### cbind
+
+```{r}
+# Crear un vector para la nueva columna
+profesiones <- c("Ingeniero", "Doctor", "Artista", "Profesor", "Arquitecto")
+
+# Añadir la columna al DataFrame
+personas_df <- cbind(personas_df, Profesion = profesiones)
+
+# Mostrar el DataFrame actualizado
+print(personas_df)
+
+```
+
+### rbind
+
+```{r}
+# Crear una nueva fila
+nueva_persona <- data.frame(Nombre = "Carlos", Edad = 38, Ciudad = "Tarapoto", Profesion = "Abogado")
+
+# Añadir la fila al DataFrame
+personas_df <- rbind(personas_df, nueva_persona)
+
+# Mostrar el DataFrame actualizado
+print(personas_df)
+
+```
+
+### merge
+```{r}
+# Crear un segundo DataFrame
+personas_info_adicional <- data.frame(ID = 1:6, 
+                                      Nombre = c("Ana", "Luis", "Marta", "Juan", "Sofía", "Carlos"),
+                                      Email = c("ana@mail.com", "luis@mail.com", "marta@mail.com", "juan@mail.com", "sofia@mail.com", "carlos@mail.com"))
+
+# Combinar los DataFrames
+personas_df_completo <- merge(personas_df, personas_info_adicional, by = "Nombre")
+
+# Mostrar el DataFrame combinado
+print(personas_df_completo)
+
+```
+
+
+```{r, echo=FALSE}
+if (!require("dplyr")) install.packages("dplyr")
+library(dplyr)
+
+```
+
+### left join
+
+```{r}
+# Asumiendo que ya tienes personas_df y personas_info_adicional creados
+personas_info_adicional <- data.frame(ID = 1:8, 
+                                      Nombre = c("Ana", "Luis", "Marta", "Juan", "Sofía", "Paolo", "Santiago", "Claudia"),
+                                      Email = c("ana@mail.com", "luis@mail.com", "marta@mail.com", "juan@mail.com", "sofia@mail.com", "paolo@mail.com", "santiago@mail.com", "claudia@mail.com"))
+
+
+# Realizar la unión izquierda
+personas_df_completo <- left_join(personas_df, personas_info_adicional, by = "Nombre")
+
+# Mostrar el DataFrame resultante
+print(personas_df_completo)
+
+```
+
+### inner join
+
+```{r}
+# Realizar la unión interna
+personas_df_inner <- inner_join(personas_df, personas_info_adicional, by = "Nombre")
+
+# Mostrar el DataFrame resultante
+print(personas_df_inner)
+
+```
+
+
+### right_join
+
+```{r}
+# Realizar la unión derecha
+personas_df_right <- right_join(personas_df, personas_info_adicional, by = "Nombre")
+
+# Mostrar el DataFrame resultante
+print(personas_df_right)
+
+```
+
+### full join
+
+```{r}
+# Realizar la unión completa
+personas_df_full <- full_join(personas_df, personas_info_adicional, by = "Nombre")
+
+# Mostrar el DataFrame resultante
+print(personas_df_full)
+
+```
+
+### empalmes secuenciales
+```{r}
+
+set.seed(123)
+d1 <- data.frame(ID = 1:20, edad = floor(runif(10, min = 18, max = 65)))
+d2 <- data.frame(ID = 1:20, escolaridad = floor(runif(10, min = 1, max = 19)))
+d3 <- data.frame(ID = 16:35, hijos = floor(runif(10, min = 0, max = 5)))
+d4 <- data.frame(ID = 11:30, ingresos = floor(runif(10, min = 1130, max = 10000)))
+
+
+print(d1)
+print(d2)
+print(d3)
+print(d4)
+
+d_total <- d1 %>% full_join(d2, by = "ID") %>% full_join(d3, by = "ID") %>% full_join(d4, by = "ID")
+print(d_total)
+
+```
+
+
+
+### filtrado de filas
+```{r}
+# Filtrar filas
+personas_mayores_30 <- personas_df %>% filter(Edad > 30)
+
+# Mostrar el resultado
+print(personas_mayores_30)
+
+```
+
+### selección de columnas
+```{r}
+# Seleccionar columnas específicas
+nombres_ciudades <- personas_df %>% select(Ciudad)
+
+# Mostrar el resultado
+print(nombres_ciudades)
+
+```
+
+### Eliminar columnas
+```{r}
+# Seleccionar columnas específicas
+sin_ciudades <- personas_df %>% select(-Ciudad)
+
+# Mostrar el resultado
+print(sin_ciudades)
+
+
+# Seleccionar columnas específicas
+sinciudades_niedades <- personas_df %>% select(-c(Ciudad, Edad))
+
+# Mostrar el resultado
+print(sinciudades_niedades)
+
+
+```
+
+
+### ordenar filas
+```{r}
+# Ordenar por edad
+personas_ordenadas_edad <- personas_df %>% arrange(Edad)
+
+# Mostrar el resultado
+print(personas_ordenadas_edad)
+
+
+#En forma descendente
+personas_ordenadas_desc_edad <- personas_df %>% arrange(desc(Edad))
+
+# Mostrar el resultado
+print(personas_ordenadas_desc_edad)
+
+
+```
+
+
+### Agrupación y agregación
+```{r}
+# Agrupar por ciudad y calcular la edad media
+edad_media_ciudad <- personas_df %>% group_by(Ciudad) %>% summarise(EdadMedia = mean(Edad))
+
+# Mostrar el resultado
+print(edad_media_ciudad)
+
+```
+
+
+### ds
+```{r}
+set.seed(123)
+d <- data.frame(ID = 1:2000, 
+                edad = floor(runif(2000, min = 18, max = 65)), 
+                escolaridad = floor(runif(2000, min = 1, max = 19)), 
+                hijos = floor(runif(2000, min = 0, max = 5)), 
+                ingresos = floor(runif(2000, min = 1130, max = 5000)), 
+                sexo = sample(c("Hombre", "Mujer"), size = 2000, replace = TRUE), 
+                ciudad = sample(c("Lima", "Arequipa", "Huancayo", "Trujillo", "Iquitos"), size = 2000, replace = TRUE))
+print(d)
+
+
+d %>% group_by(sexo) %>% summarise(mean_edad = mean(edad),
+                                   mean_esc = mean(escolaridad), 
+                                   mean_hijos = mean(hijos), 
+                                   mean_ingresos = mean(ingresos)) 
+
+g1 <- d %>% group_by(ciudad) %>% summarise(mean_edad = mean(edad),
+                                   mean_esc = mean(escolaridad), 
+                                   mean_hijos = mean(hijos), 
+                                   mean_ingresos = mean(ingresos))
+
+
+
+```
+
+
+
+### Reshape
+```{r}
+library(tidyr)
+# Cambiar de un formato ancho a largo
+personas_largo <- pivot_longer(personas_df, cols = c(Nombre, Ciudad))
+
+# Mostrar el resultado
+print(personas_largo)
+
+# Cambiar de un formato largo a ancho
+personas_ancho <- pivot_wider(personas_largo, names_from = name, values_from = value)
+
+# Mostrar el resultado
+print(personas_ancho)
+
+```
+
+```{r}
+g1
+
+# Cambiar de un formato ancho a largo
+# g1_largo <- pivot_longer(g1, cols = c(mean_edad, mean_esc, mean_hijos, mean_ingresos))
+g1_largo <- pivot_longer(g1, cols = c(starts_with('mean_')))
+
+
+# Mostrar el resultado
+print(g1_largo)
+
+
+# Cambiar de un formato largo a ancho
+g1_ancho <- pivot_wider(g1_largo, names_from = name, values_from = value)
+
+# Mostrar el resultado
+print(g1_ancho)
+```
+
+
+### Slice
+```{r}
+# Seleccionar las primeras 3 filas
+primeras_tres_filas <- slice(personas_df, 1:3)
+personas_df[1:3,]
+
+# Mostrar el resultado
+print(primeras_tres_filas)
+
+# df %>% filter() %>% select() %>% rename() %>% mutate() %>% group_by() %>% summarize() %>% slice() %>% tail()
+
+```
+
+###Tail
+```{r}
+#últimas 3 filas
+ultimas_tres_filas <- tail(personas_df, 3)
+print(ultimas_tres_filas)
+```
+
+```{r}
+g1 %>% tail(1)
+```
+
+## Tablas
+
+### Table
+```{r}
+# Crear una tabla de contingencia
+tabla_contingencia <- table(personas_df$Ciudad, personas_df$Profesion)
+
+# Mostrar la tabla
+print(tabla_contingencia)
+
+```
+
+```{r}
+print(table(d$ciudad, d$sexo))
+```
+
+
+
+### xtable
+```{r}
+# Instalar y cargar xtable
+if (!require("xtable")) install.packages("xtable")
+library(xtable)
+
+# Crear una xtable a partir de un DataFrame
+xtable_df <- xtable(personas_df)
+
+# Mostrar la xtable
+print(xtable_df, type = "latex") # Cambia a "latex" para formato LaTeX
+
+```
+### kable
+```{r}
+# Instalar y cargar knitr
+if (!require("knitr")) install.packages("knitr")
+library(knitr)
+
+# Crear una kable
+kable_df <- kable(personas_df, format = "html") # Cambia a "latex" para formato LaTeX
+
+# Mostrar la kable
+print(kable_df)
+
+```
+
+### pivot table
+```{r}
+# Instalar y cargar reshape2 o dplyr
+if (!require("reshape2")) install.packages("reshape2")
+library(reshape2)
+
+# Crear una tabla pivot
+pivot_df <- dcast(personas_df, Ciudad ~ Profesion, fun.aggregate = length)
+
+# Mostrar la tabla pivot
+print(pivot_df)
+
+```
+

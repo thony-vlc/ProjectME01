@@ -1,0 +1,296 @@
+---
+title: "Manejando listas con dataframes"
+author: "Maestría en Ciencia de Datos"
+date: "2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Gestionar dataframes dentro de listas
+
+Gestionar dataframes dentro de listas en R es una tarea común y muy útil, especialmente cuando estás trabajando con conjuntos de datos relacionados o similares. 
+
+### Crear Dataframes: 
+Primero, vamos a crear algunos dataframes para usar en nuestro ejemplo.
+
+```{r cars}
+df1 <- data.frame(
+  id = 1:3, 
+  nombre = c("Ana", "Luis", "Marta")
+)
+
+df2 <- data.frame(
+  id = 4:6, 
+  nombre = c("Carlos", "Diana", "Elena")
+)
+
+df3 <- data.frame(
+  id = 7:9, 
+  nombre = c("Felipe", "Gloria", "Hector")
+)
+```
+
+### Crear una Lista con Dataframes: 
+Luego, coloca estos dataframes en una lista.
+```{r}
+lista_df <- list(df1, df2, df3)
+print(lista_df)
+```
+
+O puedes usar nombres por cada elemento:
+```{r}
+lista_df <- list(primer_df = df1, segundo_df = df2, tercer_df = df3)
+print(lista_df)
+
+```
+
+### Acceder a un Dataframe en la Lista: 
+Para acceder a un dataframe específico dentro de la lista, puedes hacerlo por su índice o nombre.
+
+```{r}
+# Acceder por índice
+primer_df <- lista_df[[1]]
+primer_df
+
+# Acceder por nombre
+primer_df <- lista_df$primer_df
+primer_df
+```
+
+
+### Modificar un Dataframe en la Lista: 
+Si necesitas modificar alguno de los dataframes, puedes hacerlo directamente a través de la lista.
+
+```{r}
+# Añadir una nueva columna al primer dataframe
+lista_df$primer_df$edad <- c(25, 30, 35)
+lista_df$segundo_df$edad <- c(60, 55, 45)
+lista_df$tercer_df$edad <- c(15, 35, 40)
+
+print(lista_df)
+```
+
+
+### Ejemplo dataframes en listas
+```{r}
+set.seed(123)
+d1 <- data.frame(ID = 1:2000, 
+                edad = floor(runif(2000, min = 18, max = 65)), 
+                escolaridad = floor(runif(2000, min = 1, max = 19)), 
+                hijos = floor(runif(2000, min = 0, max = 5)), 
+                ingresos = floor(runif(2000, min = 1130, max = 5000)), 
+                sexo = sample(c("Hombre", "Mujer"), size = 2000, replace = TRUE), 
+                ciudad = sample(c("Lima", "Arequipa", "Huancayo", "Trujillo", "Iquitos"), size = 2000, replace = TRUE))
+
+set.seed(456)
+d2 <- data.frame(ID = 1:2000, 
+                edad = floor(runif(2000, min = 18, max = 65)), 
+                escolaridad = floor(runif(2000, min = 1, max = 19)), 
+                hijos = floor(runif(2000, min = 0, max = 5)), 
+                ingresos = floor(runif(2000, min = 1130, max = 5000)), 
+                sexo = sample(c("Hombre", "Mujer"), size = 2000, replace = TRUE), 
+                ciudad = sample(c("Lima", "Arequipa", "Huancayo", "Trujillo", "Iquitos"), size = 2000, replace = TRUE))
+
+set.seed(789)
+d3 <- data.frame(ID = 1:2000, 
+                edad = floor(runif(2000, min = 18, max = 65)), 
+                escolaridad = floor(runif(2000, min = 1, max = 19)), 
+                hijos = floor(runif(2000, min = 0, max = 5)), 
+                ingresos = floor(runif(2000, min = 1130, max = 5000)), 
+                sexo = sample(c("Hombre", "Mujer"), size = 2000, replace = TRUE), 
+                ciudad = sample(c("Lima", "Arequipa", "Huancayo", "Trujillo", "Iquitos"), size = 2000, replace = TRUE))
+
+print(head(d1))
+print(head(d2))
+print(head(d3))
+
+```
+
+
+```{r}
+lista_basepersonas <- list(y2021 = d1, y2022 = d2, y2023 = d3)
+print(mean(lista_basepersonas$y2021$ingresos))
+print(mean(lista_basepersonas$y2022$escolaridad))
+print(mean(lista_basepersonas$y2023$edad))
+```
+
+
+### Aplicar Funciones a los Dataframes en la Lista: 
+Puedes usar funciones como lapply() o sapply() para aplicar operaciones a cada dataframe en la lista. Por ejemplo, si quieres ver las dimensiones de cada dataframe
+
+```{r}
+dimensiones <- lapply(lista_df, dim)
+print(dimensiones)
+```
+
+```{r}
+lapply(lista_basepersonas, summary)
+```
+
+
+
+```{r}
+nueva_lista <- list(costa = c(200, 80, 20, 90, 180), sierra = c(50, 45, 120, 90), selva = c(25, 80, 120, 85, 160, 45))
+# for (elemento in nueva_lista) {
+#   print(mean(elemento))
+# }
+
+medias <- sapply(nueva_lista, median)
+print(medias)
+```
+
+
+### Combinar dataframes de la lista
+Si deseas combinar todos los dataframes en uno solo, puedes usar do.call() con rbind().
+
+```{r}
+# Asumiendo que lista_df es tu lista de dataframes
+df_combinado <- do.call(rbind, lista_df)
+
+# Mostrar el dataframe combinado
+print(head(df_combinado))
+
+```
+
+
+```{r}
+df_basepersonas <- do.call(rbind, lista_basepersonas)
+print(head(df_basepersonas))
+```
+
+
+### Filtrar Dataframes en una Lista
+Imagina que quieres filtrar todos tus dataframes por un criterio específico. Supongamos que cada dataframe tiene una columna edad y quieres seleccionar solo las filas donde la edad es mayor que 30.
+
+```{r}
+# Suponiendo que cada dataframe en la lista tiene una columna 'edad'
+lista_filtrada <- lapply(lista_df, function(df) {
+  subset(df, edad > 30)
+})
+
+print(lista_filtrada)
+```
+
+
+
+```{r}
+lapply(lista_basepersonas, function(df) {
+  subset(df, sexo == "Mujer" & edad == 50)
+})
+
+```
+
+### Aplicar una Función a Columnas Específicas en Dataframes
+Si deseas aplicar una función a una columna específica en todos los dataframes, puedes hacerlo así:
+
+```{r}
+# Aplicar la función 'mean' a la columna 'edad'
+medias_edades <- sapply(lista_df, function(df) {
+  mean(df$edad, na.rm = TRUE)
+})
+
+print(medias_edades)
+
+```
+
+```{r}
+sapply(lista_basepersonas, function(df) {
+  mean(df$edad, na.rm = TRUE)
+})
+
+```
+
+### Añadir una Nueva Columna a Cada Dataframe
+Para añadir una nueva columna a cada dataframe en la lista, puedes usar lapply:
+
+```{r}
+# Añadir una columna 'pais' a cada dataframe
+lista_df <- lapply(lista_df, function(df) {
+  df$pais <- 'Perú' # Añadir el mismo valor a todos
+  return(df)
+})
+
+print(lista_df)
+```
+### Combinar Columnas de Dataframes de una Lista
+Si tienes múltiples dataframes y deseas combinar columnas específicas de cada uno en un nuevo dataframe:
+```{r}
+# Combinar la columna 'nombre' de cada dataframe
+nombres_combinados <- do.call(rbind, lapply(lista_df, function(df) {
+  df[, 'nombre', drop = FALSE]
+}))
+
+print(nombres_combinados)
+```
+
+Si deseo combinar dataframes con una operacion previa (como filtrar a mujeres, o personas mayores a 30 años antes de empalmarlas)
+
+```{r}
+mujeres <- do.call(rbind, lapply(lista_basepersonas, function(df) {
+  subset(df, sexo == "Mujer")
+}))
+
+print(head(mujeres))
+```
+
+```{r}
+promedio_ingresos <- do.call(rbind, lapply(lista_basepersonas, function(df) {
+  mean(df$ingresos, na.rm = TRUE ) 
+}))
+
+print(head(promedio_ingresos))
+```
+
+
+### Ordenar Dataframes Dentro de una Lista
+Para ordenar cada dataframe en la lista por una columna específica:
+
+```{r}
+# Ordenar cada dataframe por 'edad'
+lista_ordenada <- lapply(lista_df, function(df) {
+  df[order(df$edad), ]
+})
+
+print(lista_ordenada)
+```
+
+### Usar lapply() con Pipe
+Supongamos que quieres aplicar una función a cada dataframe en la lista. Puedes combinar lapply() con el operador pipe para lograrlo:
+
+```{r}
+library(dplyr)
+
+lista_df %>% 
+  lapply(function(df) {
+    df %>% 
+      filter(edad > 30) %>% 
+      mutate(edad_cuadrado = edad ^ 2)
+  })
+
+
+print(lista_df)
+```
+
+
+```{r}
+lista_nueva <- lista_basepersonas %>% 
+  lapply(function(df){
+    df %>% 
+      filter(edad>45) %>% 
+      group_by(ciudad) %>% 
+      summarise(mean(hijos), mean(escolaridad), mean(ingresos))
+  })
+
+print(lista_nueva)
+```
+
+```{r}
+promedios <- do.call(rbind, lista_nueva)
+print(promedios)
+```
+
+
+
